@@ -33,10 +33,14 @@ class EntropyWave:
 
 class CrisprProxy:
     @staticmethod
-    def sim(gene):
+    def sim(gene, entropy_h=1.18):
         density = 0.02
         volatility = -0.15
-        return f"Crisp {gene}: Density +{density}, Volatility {volatility}; Border: 0.0 (No Infinity)"
+        # Algebraic cut for finite border (Schwarz-inspired)
+        border = 0.0 if entropy_h < 2.0 else 0.02  # No infinity if stable
+        if entropy_h < 1.0:
+            density += 0.02  # Rebuild amp
+        return f"Crisp {gene}: Density +{density}, Volatility {volatility}; Border: {border} (Entropy {entropy_h:.2f})"
 
 class TreeVisualizer:
     @staticmethod
@@ -50,7 +54,7 @@ class TreeVisualizer:
         return fig
 
 def main():
-    st.title("Ancestry Portal Prototype v47 – Test & Refine Mode")
+    st.title("Ancestry Portal Prototype v48 – CRISPR + Entropy Amp")
 
     tab1, tab2 = st.tabs(["Main Portal", "Test Mode"])
 
@@ -95,7 +99,7 @@ Marta Majdan (Root)
             st.metric("Test TMRCA", f"{mean_tmrc:.0f}y", delta=f"+{std_tmrc:.0f}y")
         st.write("Refinement: Auto-tweak if fit <90% (e.g., +2% amp).")
 
-    st.write("v47: Modular, async, API-ready. Ready for full mode – add GAN/entropy wave next?")
+    st.write("v48: CRISPR integration with entropy border; algebraic cut for finite amps. Ready for full mode – add GAN/entropy wave next?")
 
 if __name__ == "__main__":
     main()
